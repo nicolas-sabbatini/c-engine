@@ -1,3 +1,9 @@
+#define SOKOL_APP_IMPL
+#define SOKOL_GLCORE
+#define SOKOL_EGL
+#include "vendors/sokol/sokol_app.h"
+#include "vendors/sokol/sokol_gfx.h"
+
 #include "globals.h"
 #include <stdint.h>
 #include <stdio.h>
@@ -9,8 +15,17 @@ void init() {
 
 void clean() { printf("Exit game\n"); }
 
-int main(/*int argc, char *argv[]*/) {
-  init();
-  clean();
-  return 0;
+void draw() {}
+
+void update() {}
+
+sapp_desc sokol_main(int argc, char *argv[]) {
+  return (sapp_desc){
+      .width = 640,
+      .height = 480,
+      .init_cb = init,
+      .frame_cb = draw,
+      .cleanup_cb = clean,
+      .event_cb = update,
+  };
 }

@@ -1,6 +1,6 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -std=gnu99
-LDFLAGS =
+CFLAGS = -Wall -Wextra -std=gnu99 -pthread
+LDFLAGS = -lGL -ldl -lm -lX11 -lasound -lXi -lXcursor
 
 SRCDIR = src
 TARGETDIR = target
