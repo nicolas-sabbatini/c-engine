@@ -1,0 +1,16 @@
+-Wall
+-Wextra
+-std=gnu99
+-pthread
+-Ivendors
+-g
+-O0
+-DDEBUG
+-D_DEBUG
+-lGL
+-ldl
+-lm
+-lX11
+-lasound
+-lXi
+-lXcursor

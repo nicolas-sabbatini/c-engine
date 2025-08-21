@@ -1,31 +1,45 @@
-#define SOKOL_APP_IMPL
+#include "globals.h"
+#include <stdbool.h>
+#include <stdint.h>
+
+#define SOKOL_IMPL
 #define SOKOL_GLCORE
 #define SOKOL_EGL
-#include "vendors/sokol/sokol_app.h"
-#include "vendors/sokol/sokol_gfx.h"
-
-#include "globals.h"
-#include <stdint.h>
-#include <stdio.h>
+#include "sokol/sokol_app.h"
+#include "sokol/sokol_gfx.h"
+#include "sokol/sokol_log.h"
 
 void init() {
-  printf("Game width: %d!\n", GAME_WIDTH);
-  printf("Game height: %d!\n", GAME_HEIGHT);
+  log_printf(INFO, "Game width: %d!", GAME_WIDTH);
+  log_printf(INFO, "Game height: %d!", GAME_HEIGHT);
 }
 
-void clean() { printf("Exit game\n"); }
+void clean() { log_printf(INFO, "Exit game"); }
 
-void draw() {}
+void frame() {}
 
-void update() {}
+static void event(const sapp_event *e) {
+  if (e->type == SAPP_EVENTTYPE_RESIZED) {
+    log_printf(INFO, "Resize windows");
+    GAME_WIDTH = sapp_width();
+    GAME_HEIGHT = sapp_height();
+    log_printf(INFO, "New game width: %d!", GAME_WIDTH);
+    log_printf(INFO, "New game height: %d!", GAME_HEIGHT);
+  }
+}
 
 sapp_desc sokol_main(int argc, char *argv[]) {
   return (sapp_desc){
-      .width = 640,
-      .height = 480,
+      // Callbacks
       .init_cb = init,
-      .frame_cb = draw,
+      .frame_cb = frame,
       .cleanup_cb = clean,
-      .event_cb = update,
+      .event_cb = event,
+      .logger.func = slog_func,
+      // Options
+      .width = 800,
+      .height = 600,
+      .high_dpi = true,
+      .window_title = "My engine",
   };
 }

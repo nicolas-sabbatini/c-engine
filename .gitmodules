@@ -1,3 +1,4 @@
-[submodule "src/vendors/sokol"]
-	path = src/vendors/sokol
+
+[submodule "vendors/sokol"]
+	path = vendors/sokol
 	url = git@github.com:floooh/sokol.git
