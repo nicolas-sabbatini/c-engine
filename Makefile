@@ -38,3 +38,7 @@ clean:
 compile_flags:
 	@echo $(CFLAGS) | tr ' ' '\n' > compile_flags.txt
 	@echo $(LDFLAGS) | tr ' ' '\n' >> compile_flags.txt
+
+set_up:
+	git submodule init
+	git submodule update --remote
