@@ -1,8 +1,12 @@
-#include "globals.h"
 #include "sokol/sokol_log.h"
 #include <stdarg.h>
 #include <stdint.h>
 #include <stdio.h>
+
+#define PANIC 0
+#define ERROR 1
+#define WARNING 2
+#define INFO 3
 
 void log_printf(uint32_t level, const char *fmt, ...) {
   char buf[1024];

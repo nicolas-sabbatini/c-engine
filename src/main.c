@@ -1,4 +1,5 @@
-#include "globals.h"
+#include "globals.c"
+
 #include <stdbool.h>
 #include <stdint.h>
 

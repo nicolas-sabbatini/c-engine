@@ -1,44 +1,37 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -std=gnu99 -pthread -Ivendors
+CFLAGS = -Wall -Wextra -std=c99 -pthread -Ivendors
 LDFLAGS = -lGL -ldl -lm -lX11 -lasound -lXi -lXcursor
 
-SRCDIR = src
 TARGETDIR = target
 BINDIR = bin
-SRCS = $(wildcard $(SRCDIR)/*.c)
-OBJS = $(patsubst $(SRCDIR)/%.c,$(TARGETDIR)/%.o,$(SRCS))
 BIN_NAME = engine
 
 RELEASE ?= 0
 ifeq ($(RELEASE), 0)
-    CFLAGS += -g -O0 -DDEBUG -D_DEBUG
+    CFLAGS += -ggdb -O0 -DDEBUG -D_DEBUG
 else
     CFLAGS += -O3
 endif
 
-.PHONY: all clean compile_flags
-
 # Default
-all: compile_flags run
-
-run: $(BIN_NAME)
-	./bin/$^
-
-$(BIN_NAME): $(OBJS)
+$(BINDIR)/$(BIN_NAME): src/main.c
 	@mkdir -p $(BINDIR)
-	$(CC) $(CFLAGS) $^ $(LDFLAGS) -o $(BINDIR)/$@
+	$(CC) $(CFLAGS) src/main.c $(LDFLAGS) -o $@
 
-$(TARGETDIR)/%.o: $(SRCDIR)/%.c
-	@mkdir -p $(TARGETDIR)
-	$(CC) $(CFLAGS) $(LDFLAGS) -c $^ -o $@
+run: $(BINDIR)/$(BIN_NAME)
+	./$^
+
+all: compile_flags.txt run
 
 clean:
-	rm -fr $(TARGETDIR)/* $(BINDIR)/* compile_flags.txt
+	rm -fr $(BINDIR)/* compile_flags.txt
 
-compile_flags:
+compile_flags.txt:
 	@echo $(CFLAGS) | tr ' ' '\n' > compile_flags.txt
 	@echo $(LDFLAGS) | tr ' ' '\n' >> compile_flags.txt
 
 set_up:
 	git submodule init
 	git submodule update --remote
+
+.PHONY: all clean
