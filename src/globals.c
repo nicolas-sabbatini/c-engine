@@ -1,6 +1,5 @@
 #include "sokol/sokol_log.h"
 #include <stdarg.h>
-#include <stdint.h>
 #include <stdio.h>
 
 #define PANIC 0

@@ -1,8 +1,5 @@
 #include "globals.c"
 
-#include <stdbool.h>
-#include <stdint.h>
-
 #define SOKOL_IMPL
 #define SOKOL_GLCORE
 #define SOKOL_EGL

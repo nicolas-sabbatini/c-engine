@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -std=c99 -pthread -Ivendors
+CFLAGS = -Wall -Wextra -std=c23 -pthread -Ivendors
 LDFLAGS = -lGL -ldl -lm -lX11 -lasound -lXi -lXcursor
 
 TARGETDIR = target
