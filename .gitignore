@@ -1,3 +1,6 @@
 .vim
-target
+vendors
 bin
+objects
+compile_flags.txt
+shader_out

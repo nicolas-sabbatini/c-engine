@@ -1,28 +1,58 @@
-#include "globals.c"
+#define LOGGING_IMPL
+#include "globals.h"
 
 #define SOKOL_IMPL
-#define SOKOL_GLCORE
-#define SOKOL_EGL
-#include "sokol/sokol_app.h"
-#include "sokol/sokol_gfx.h"
-#include "sokol/sokol_log.h"
+#include "sokol_app.h"
+#include "sokol_gfx.h"
+#include "sokol_glue.h"
+#include "sokol_log.h"
+
+static struct {
+  sg_pass_action pass;
+} ctx;
 
 void init() {
-  log_printf(INFO, "Game width: %d!", GAME_WIDTH);
-  log_printf(INFO, "Game height: %d!", GAME_HEIGHT);
+  log_printf(INFO, "Window width: %d!", window_width);
+  log_printf(INFO, "Window height: %d!", window_height);
+
+  sg_setup(&(sg_desc){
+      .environment = sglue_environment(),
+      .logger.func = slog_func,
+  });
+
+  ctx.pass = (sg_pass_action){
+      .colors[0] =
+          {
+              .load_action = SG_LOADACTION_CLEAR,
+              .clear_value = {0.694, 0.89, 0.98, 1.0},
+          },
+  };
 }
 
-void clean() { log_printf(INFO, "Exit game"); }
+void clean() {
+  sg_shutdown();
+  log_printf(INFO, "Exit game");
+}
 
-void frame() {}
+void frame() {
+  sg_begin_pass(&(sg_pass){.action = ctx.pass, .swapchain = sglue_swapchain()});
+  sg_end_pass();
+  sg_commit();
+}
 
 static void event(const sapp_event *e) {
-  if (e->type == SAPP_EVENTTYPE_RESIZED) {
-    log_printf(INFO, "Resize windows");
-    GAME_WIDTH = sapp_width();
-    GAME_HEIGHT = sapp_height();
-    log_printf(INFO, "New game width: %d!", GAME_WIDTH);
-    log_printf(INFO, "New game height: %d!", GAME_HEIGHT);
+  switch (e->type) {
+  case SAPP_EVENTTYPE_RESIZED:
+    window_width = e->window_width;
+    window_height = e->window_height;
+    log_printf(INFO, "New window size: %d x %d", window_width, window_height);
+    break;
+  case SAPP_EVENTTYPE_KEY_DOWN:
+    if (e->key_code == SAPP_KEYCODE_ESCAPE) {
+      sapp_quit();
+    }
+    break;
+  default:
   }
 }
 
@@ -35,9 +65,9 @@ sapp_desc sokol_main(int argc, char *argv[]) {
       .event_cb = event,
       .logger.func = slog_func,
       // Options
-      .width = 800,
-      .height = 600,
+      .width = window_width,
+      .height = window_height,
       .high_dpi = true,
-      .window_title = "My engine",
+      .window_title = "My render",
   };
 }
