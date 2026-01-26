@@ -1,73 +1,18 @@
-#define LOGGING_IMPL
-#include "globals.h"
+#include "vendors/raylib.h"
+#include <stdlib.h>
 
-#define SOKOL_IMPL
-#include "sokol_app.h"
-#include "sokol_gfx.h"
-#include "sokol_glue.h"
-#include "sokol_log.h"
+int main() {
+  SetConfigFlags(FLAG_WINDOW_HIGHDPI | FLAG_WINDOW_RESIZABLE | FLAG_VSYNC_HINT);
 
-static struct {
-  sg_pass_action pass;
-} ctx;
+  const int screenWidth = 800;
+  const int screenHeight = 600;
+  InitWindow(screenWidth, screenHeight, "Simple c engine");
 
-void init() {
-  log_printf(INFO, "Window width: %d!", window_width);
-  log_printf(INFO, "Window height: %d!", window_height);
-
-  sg_setup(&(sg_desc){
-      .environment = sglue_environment(),
-      .logger.func = slog_func,
-  });
-
-  ctx.pass = (sg_pass_action){
-      .colors[0] =
-          {
-              .load_action = SG_LOADACTION_CLEAR,
-              .clear_value = {0.694, 0.89, 0.98, 1.0},
-          },
-  };
-}
-
-void clean() {
-  sg_shutdown();
-  log_printf(INFO, "Exit game");
-}
-
-void frame() {
-  sg_begin_pass(&(sg_pass){.action = ctx.pass, .swapchain = sglue_swapchain()});
-  sg_end_pass();
-  sg_commit();
-}
-
-static void event(const sapp_event *e) {
-  switch (e->type) {
-  case SAPP_EVENTTYPE_RESIZED:
-    window_width = e->window_width;
-    window_height = e->window_height;
-    log_printf(INFO, "New window size: %d x %d", window_width, window_height);
-    break;
-  case SAPP_EVENTTYPE_KEY_DOWN:
-    if (e->key_code == SAPP_KEYCODE_ESCAPE) {
-      sapp_quit();
-    }
-    break;
-  default:
+  while (!WindowShouldClose()) {
+    BeginDrawing();
+    ClearBackground(BLACK);
+    EndDrawing();
   }
-}
-
-sapp_desc sokol_main(int argc, char *argv[]) {
-  return (sapp_desc){
-      // Callbacks
-      .init_cb = init,
-      .frame_cb = frame,
-      .cleanup_cb = clean,
-      .event_cb = event,
-      .logger.func = slog_func,
-      // Options
-      .width = window_width,
-      .height = window_height,
-      .high_dpi = true,
-      .window_title = "My render",
-  };
+  CloseWindow();
+  return EXIT_SUCCESS;
 }

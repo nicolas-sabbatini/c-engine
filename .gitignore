@@ -1,6 +1,5 @@
 .vim
-vendors
+libs
 bin
 objects
 compile_flags.txt
-shader_out
