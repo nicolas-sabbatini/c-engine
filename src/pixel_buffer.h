@@ -27,11 +27,19 @@ typedef struct PixelBuffer {
   Pixel buffer[];
 } PixelBuffer;
 
-PixelBuffer *new_pixel_buffer(unsigned int width, unsigned int height);
+PixelBuffer* new_pixel_buffer(unsigned int width, unsigned int height);
 
-void clear_pixel_buffer(PixelBuffer *pixel_buffer, Pixel color);
+void clear_pixel_buffer(PixelBuffer* pixel_buffer, Pixel color);
 
 void shader_pixel_buffer(
-    PixelBuffer *pixel_buffer,
-    Pixel (*shader)(unsigned int x, unsigned int y, PixelBuffer *pixel_buffer, void *context),
-    void *context);
+    PixelBuffer* pixel_buffer,
+    Pixel (*shader)(unsigned int x, unsigned int y, PixelBuffer* pixel_buffer, void* context),
+    void* context);
+
+void rectangle_pixel_buffer(
+    PixelBuffer* pixel_buffer,
+    unsigned int x,
+    unsigned int y,
+    unsigned int width,
+    unsigned int height,
+    Pixel color);
