@@ -39,4 +39,7 @@ clean:
 clean-all:
 	rm -fr bin objects compile_flags.txt
 
-.PHONY: all clean compile_flags.txt run
+release:
+	make clean && make run RELEASE=true
+
+.PHONY: all clean compile_flags.txt run clean-all release
