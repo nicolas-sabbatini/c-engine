@@ -7,6 +7,9 @@
 #include "vectors.h"
 #include "vendors/raylib.h"
 
+const float_t fov_factor = 640.0;
+const Vec3 camera_position = (Vec3){0.0, 0.0, -5.0};
+
 Pixel cheker_board(
     unsigned int x, unsigned int y, __attribute__((unused)) PixelBuffer* pixel_buffer, __attribute__((unused)) void* context) {
   if (((x / 50) % 2 == 0 && (y / 50) % 2 == 0) ||
@@ -17,9 +20,9 @@ Pixel cheker_board(
 }
 
 void orthographic_projection(PixelBuffer* pixel_buffer, Vec3 vec, Pixel color) {
-  Vec2 projected_point = (Vec2){vec.x, vec.y};
-  int target_x = (int)(((float_t)pixel_buffer->width / 2) + 100.0 * projected_point.x);
-  int target_y = (int)(((float_t)pixel_buffer->height / 2) + 100.0 * projected_point.y);
+  Vec2 projected_point = (Vec2){vec.x * fov_factor, vec.y * fov_factor};
+  int target_x = (int)(((float_t)pixel_buffer->width / 2) + projected_point.x);
+  int target_y = (int)(((float_t)pixel_buffer->height / 2) + projected_point.y);
 
   rectangle_pixel_buffer(pixel_buffer, target_x, target_y, 5, 5, color);
 }
@@ -30,13 +33,38 @@ void isometric_projection(PixelBuffer* pixel_buffer, Vec3 vec, Pixel color) {
   //   screen_y = y + (x + z) * sin(30°)
   // Where cos(30°) ≈ 0.866 and sin(30°) = 0.5
   Vec2 projected_point = (Vec2){
-      (vec.x - vec.z) * 0.866f,
-      -vec.y + (vec.x + vec.z) * 0.5f};
+      (vec.x - vec.z) * 0.866f * fov_factor,
+      (-vec.y + (vec.x + vec.z) * 0.5f) * fov_factor};
 
-  int target_x = (int)(((float_t)pixel_buffer->width / 2) + 100.0 * projected_point.x);
-  int target_y = (int)(((float_t)pixel_buffer->height / 2) + 100.0 * projected_point.y);
+  int target_x = (int)(((float_t)pixel_buffer->width / 2) + projected_point.x);
+  int target_y = (int)(((float_t)pixel_buffer->height / 2) + projected_point.y);
 
   rectangle_pixel_buffer(pixel_buffer, target_x, target_y, 5, 5, color);
+}
+
+void perspective_projection(PixelBuffer* pixel_buffer, Vec3 vec, Pixel color) {
+  Vec2 projected_point = (Vec2){
+      (vec.x * fov_factor) / (vec.z - camera_position.z),
+      (-vec.y * fov_factor) / (vec.z - camera_position.z)};
+
+  int target_x = (int)(((float_t)pixel_buffer->width / 2) + projected_point.x);
+  int target_y = (int)(((float_t)pixel_buffer->height / 2) + projected_point.y);
+
+  float_t distance = vec.z - camera_position.z;
+  float_t max_distance = 10.0f;
+  float_t brightness = 1.0f - (distance / max_distance);
+
+  if (brightness < 0.0f) brightness = 0.0f;
+  if (brightness > 1.0f) brightness = 1.0f;
+
+  Pixel shaded_color = (Pixel){
+      .r = (uint8_t)(color.r * brightness),
+      .g = (uint8_t)(color.g * brightness),
+      .b = (uint8_t)(color.b * brightness),
+      .a = color.a,
+  };
+
+  rectangle_pixel_buffer(pixel_buffer, target_x, target_y, 5, 5, shaded_color);
 }
 
 int main() {
@@ -84,10 +112,12 @@ int main() {
     clear_pixel_buffer(pixel_buffer, COLOR_RGB(0x0F0F0F));
     for (size_t point = 0; point < point_count; point++) {
       // orthographic_projection(pixel_buffer, cube[point], COLOR_RGB(0xF0A00F));
-      isometric_projection(pixel_buffer, cube[point], COLOR_RGB(0xF0A00F));
+      // isometric_projection(pixel_buffer, cube[point], COLOR_RGB(0xF0A00F));
+      perspective_projection(pixel_buffer, cube[point], COLOR_RGB(0xF0A00F));
     }
     // orthographic_projection(pixel_buffer, (Vec3){-1.0, -1.0, -1.0}, COLOR_RGB(0xA00FF0));
-    isometric_projection(pixel_buffer, (Vec3){-1.0, -1.0, -1.0}, COLOR_RGB(0xA00FF0));
+    // isometric_projection(pixel_buffer, (Vec3){-1.0, -1.0, -1.0}, COLOR_RGB(0xA00FF0));
+    // perspective_projection(pixel_buffer, (Vec3){-1.0, -1.0, -1.0}, COLOR_RGB(0xA00FF0));
     // Send changes to GPU
     UpdateTexture(texture, pixel_buffer->buffer);
 
