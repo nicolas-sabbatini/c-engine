@@ -34,6 +34,9 @@ run: bin/main
 all: compile_flags.txt run
 
 clean:
+	rm -fr bin objects
+
+clean-all:
 	rm -fr bin objects compile_flags.txt
 
 .PHONY: all clean compile_flags.txt run
