@@ -24,6 +24,21 @@ void orthographic_projection(PixelBuffer* pixel_buffer, Vec3 vec, Pixel color) {
   rectangle_pixel_buffer(pixel_buffer, target_x, target_y, 5, 5, color);
 }
 
+void isometric_projection(PixelBuffer* pixel_buffer, Vec3 vec, Pixel color) {
+  // Isometric projection formula:
+  //   screen_x = (x - z) * cos(30°)
+  //   screen_y = y + (x + z) * sin(30°)
+  // Where cos(30°) ≈ 0.866 and sin(30°) = 0.5
+  Vec2 projected_point = (Vec2){
+      (vec.x - vec.z) * 0.866f,
+      -vec.y + (vec.x + vec.z) * 0.5f};
+
+  int target_x = (int)(((float_t)pixel_buffer->width / 2) + 100.0 * projected_point.x);
+  int target_y = (int)(((float_t)pixel_buffer->height / 2) + 100.0 * projected_point.y);
+
+  rectangle_pixel_buffer(pixel_buffer, target_x, target_y, 5, 5, color);
+}
+
 int main() {
   // Set up screen
   SetConfigFlags(FLAG_WINDOW_HIGHDPI | FLAG_WINDOW_UNDECORATED | FLAG_VSYNC_HINT);
@@ -68,8 +83,11 @@ int main() {
     // rectangle_pixel_buffer(pixel_buffer, 400, 400, 500, 500, COLOR_RGB(0xDD0000));
     clear_pixel_buffer(pixel_buffer, COLOR_RGB(0x0F0F0F));
     for (size_t point = 0; point < point_count; point++) {
-      orthographic_projection(pixel_buffer, cube[point], COLOR_RGB(0xF0A00F));
+      // orthographic_projection(pixel_buffer, cube[point], COLOR_RGB(0xF0A00F));
+      isometric_projection(pixel_buffer, cube[point], COLOR_RGB(0xF0A00F));
     }
+    // orthographic_projection(pixel_buffer, (Vec3){-1.0, -1.0, -1.0}, COLOR_RGB(0xA00FF0));
+    isometric_projection(pixel_buffer, (Vec3){-1.0, -1.0, -1.0}, COLOR_RGB(0xA00FF0));
     // Send changes to GPU
     UpdateTexture(texture, pixel_buffer->buffer);
 
