@@ -4,6 +4,7 @@
 #include <stdlib.h>
 
 #include "pixel_buffer.h"
+#include "vectors.h"
 #include "vendors/raylib.h"
 
 Pixel cheker_board(
@@ -15,7 +16,16 @@ Pixel cheker_board(
   return COLOR_RGB(0xE0E0E0);
 }
 
+void orthographic_projection(PixelBuffer* pixel_buffer, Vec3 vec, Pixel color) {
+  Vec2 projected_point = (Vec2){vec.x, vec.y};
+  int target_x = (int)(((float_t)pixel_buffer->width / 2) + 100.0 * projected_point.x);
+  int target_y = (int)(((float_t)pixel_buffer->height / 2) + 100.0 * projected_point.y);
+
+  rectangle_pixel_buffer(pixel_buffer, target_x, target_y, 5, 5, color);
+}
+
 int main() {
+  // Set up screen
   SetConfigFlags(FLAG_WINDOW_HIGHDPI | FLAG_WINDOW_UNDECORATED | FLAG_VSYNC_HINT);
   size_t screen_width = 0;
   size_t screen_height = 0;
@@ -23,12 +33,14 @@ int main() {
   SetTargetFPS(60);
   int monitor = GetCurrentMonitor();
   SetWindowSize(GetMonitorWidth(monitor), GetMonitorHeight(monitor));
-  screen_width = GetMonitorWidth(monitor) / 2;
-  screen_height = GetMonitorHeight(monitor) / 2;
+  // 4k monitor is to much so 1024 x 640
+  screen_width = GetMonitorWidth(monitor) / 4;
+  screen_height = GetMonitorHeight(monitor) / 4;
+  printf("Buffer size: %zu x %zu\n", screen_width, screen_height);
 
+  // Create pixel buffer
   PixelBuffer* pixel_buffer = new_pixel_buffer(screen_width, screen_height);
   clear_pixel_buffer(pixel_buffer, COLOR_RGB(0xFF0000));
-
   Image img = {
       .data = pixel_buffer->buffer,
       .width = pixel_buffer->width,
@@ -38,23 +50,44 @@ int main() {
   };
   Texture2D texture = LoadTextureFromImage(img);
 
+  // Create a cube of points
+  size_t point_count = 0;
+  Vec3* cube = malloc(sizeof(Vec3) * 9 * 9 * 9);
+  for (float_t x = -1.0; x <= 1; x += 0.25) {
+    for (float_t y = -1.0; y <= 1; y += 0.25) {
+      for (float_t z = -1.0; z <= 1; z += 0.25) {
+        cube[point_count] = (Vec3){x, y, z};
+        point_count += 1;
+      }
+    }
+  }
+
   while (!WindowShouldClose()) {
     // Update texture
-    shader_pixel_buffer(pixel_buffer, cheker_board, NULL);
-    rectangle_pixel_buffer(pixel_buffer, 400, 400, 500, 500, COLOR_RGB(0xDD0000));
+    // shader_pixel_buffer(pixel_buffer, cheker_board, NULL);
+    // rectangle_pixel_buffer(pixel_buffer, 400, 400, 500, 500, COLOR_RGB(0xDD0000));
+    clear_pixel_buffer(pixel_buffer, COLOR_RGB(0x0F0F0F));
+    for (size_t point = 0; point < point_count; point++) {
+      orthographic_projection(pixel_buffer, cube[point], COLOR_RGB(0xF0A00F));
+    }
     // Send changes to GPU
     UpdateTexture(texture, pixel_buffer->buffer);
 
     // Draw to screen
     BeginDrawing();
     ClearBackground(BLACK);
-    DrawTextureEx(texture, (Vector2){}, 0, 2.0, WHITE);
+    // Scale to 4k
+    DrawTextureEx(texture, (Vector2){}, 0, 4.0, WHITE);
     DrawFPS(10, 10);
     EndDrawing();
   }
 
+  // Free pixel buffer
   free(pixel_buffer);
   UnloadTexture(texture);
+
+  // Frre cube
+  free(cube);
 
   CloseWindow();
   return EXIT_SUCCESS;

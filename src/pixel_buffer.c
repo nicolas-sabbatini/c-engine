@@ -32,8 +32,8 @@ void shader_pixel_buffer(
 
 void rectangle_pixel_buffer(
     PixelBuffer* pixel_buffer,
-    unsigned int ox,
-    unsigned int oy,
+    int ox,
+    int oy,
     unsigned int width,
     unsigned int height,
     Pixel color) {
@@ -47,11 +47,13 @@ void rectangle_pixel_buffer(
       if (target_x >= pixel_buffer->width) {
         continue;
       }
-      pixel_buffer->buffer[(target_y * pixel_buffer->width) + target_x] = color;
+      poke_pixel_buffer(pixel_buffer, target_x, target_y, color);
     }
   }
 }
 
-void poke_pixel_buffer(PixelBuffer* pixel_buffer, unsigned int x, unsigned int y, Pixel color) {
-  pixel_buffer->buffer[(y * pixel_buffer->width) + x] = color;
+void poke_pixel_buffer(PixelBuffer* pixel_buffer, int x, int y, Pixel color) {
+  if (x > 0 && x < (int)pixel_buffer->width && y > 0 && y < (int)pixel_buffer->height) {
+    pixel_buffer->buffer[(y * pixel_buffer->width) + x] = color;
+  }
 }

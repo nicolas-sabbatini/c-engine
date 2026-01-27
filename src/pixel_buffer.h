@@ -38,10 +38,10 @@ void shader_pixel_buffer(
 
 void rectangle_pixel_buffer(
     PixelBuffer* pixel_buffer,
-    unsigned int x,
-    unsigned int y,
+    int x,
+    int y,
     unsigned int width,
     unsigned int height,
     Pixel color);
 
-void poke_pixel_buffer(PixelBuffer* pixel_buffer, unsigned int x, unsigned int y, Pixel color);
+void poke_pixel_buffer(PixelBuffer* pixel_buffer, int x, int y, Pixel color);
