@@ -6,12 +6,13 @@
 #include "pixel_buffer.h"
 #include "vendors/raylib.h"
 
-Pixel cheker_board(unsigned int x, unsigned int y, __attribute__((unused)) PixelBuffer* pixel_buffer, void* context) {
-  unsigned int offset = *(unsigned int*)context;
-  if ((((x + offset) / 50) % 2 == 0 && ((y + offset) / 50) % 2 == 0) || (((x + offset) / 50) % 2 == 1 && ((y + offset) / 50) % 2 == 1)) {
-    return COLOR_RGB(0x0F0F0F);
+Pixel cheker_board(
+    unsigned int x, unsigned int y, __attribute__((unused)) PixelBuffer* pixel_buffer, __attribute__((unused)) void* context) {
+  if (((x / 50) % 2 == 0 && (y / 50) % 2 == 0) ||
+      ((x / 50) % 2 == 1 && (y / 50) % 2 == 1)) {
+    return COLOR_RGB(0x101010);
   }
-  return COLOR_RGB(0xF0F0F0);
+  return COLOR_RGB(0xE0E0E0);
 }
 
 int main() {
@@ -39,10 +40,8 @@ int main() {
 
   while (!WindowShouldClose()) {
     // Update texture
-    // unsigned int offset = (unsigned int)(GetTime() * 3.0);
-    // shader_pixel_buffer(pixel_buffer, cheker_board, &offset);
-    clear_pixel_buffer(pixel_buffer, COLOR_RGB(0x0F0F0F));
-    rectangle_pixel_buffer(pixel_buffer, 400, 400, 500, 500, COLOR_RGB(0xFF0000));
+    shader_pixel_buffer(pixel_buffer, cheker_board, NULL);
+    rectangle_pixel_buffer(pixel_buffer, 400, 400, 500, 500, COLOR_RGB(0xDD0000));
     // Send changes to GPU
     UpdateTexture(texture, pixel_buffer->buffer);
 

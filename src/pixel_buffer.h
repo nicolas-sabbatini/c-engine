@@ -43,3 +43,5 @@ void rectangle_pixel_buffer(
     unsigned int width,
     unsigned int height,
     Pixel color);
+
+void poke_pixel_buffer(PixelBuffer* pixel_buffer, unsigned int x, unsigned int y, Pixel color);

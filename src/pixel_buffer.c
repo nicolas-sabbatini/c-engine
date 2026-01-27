@@ -13,10 +13,8 @@ PixelBuffer* new_pixel_buffer(unsigned int width, unsigned int height) {
 }
 
 void clear_pixel_buffer(PixelBuffer* pixel_buffer, Pixel color) {
-  for (unsigned int y = 0; y < pixel_buffer->height; y++) {
-    for (unsigned int x = 0; x < pixel_buffer->width; x++) {
-      pixel_buffer->buffer[(y * pixel_buffer->width) + x] = color;
-    }
+  for (unsigned int i = 0; i < pixel_buffer->height * pixel_buffer->width; i++) {
+    pixel_buffer->buffer[i] = color;
   }
 }
 
@@ -52,4 +50,8 @@ void rectangle_pixel_buffer(
       pixel_buffer->buffer[(target_y * pixel_buffer->width) + target_x] = color;
     }
   }
+}
+
+void poke_pixel_buffer(PixelBuffer* pixel_buffer, unsigned int x, unsigned int y, Pixel color) {
+  pixel_buffer->buffer[(y * pixel_buffer->width) + x] = color;
 }
