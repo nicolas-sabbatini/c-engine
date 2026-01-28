@@ -9,6 +9,7 @@
 
 const float_t fov_factor = 640.0;
 const Vec3 camera_position = (Vec3){0.0, 0.0, -5.0};
+float_t cube_rotation = 0.0;
 
 Pixel cheker_board(
     unsigned int x, unsigned int y, __attribute__((unused)) PixelBuffer* pixel_buffer, __attribute__((unused)) void* context) {
@@ -43,14 +44,18 @@ void isometric_projection(PixelBuffer* pixel_buffer, Vec3 vec, Pixel color) {
 }
 
 void perspective_projection(PixelBuffer* pixel_buffer, Vec3 vec, Pixel color) {
+  Vec3 vec_rotated = vec3_rotate_x(vec, cube_rotation);
+  vec_rotated = vec3_rotate_y(vec_rotated, cube_rotation);
+  vec_rotated = vec3_rotate_z(vec_rotated, cube_rotation);
+
   Vec2 projected_point = (Vec2){
-      (vec.x * fov_factor) / (vec.z - camera_position.z),
-      (-vec.y * fov_factor) / (vec.z - camera_position.z)};
+      (vec_rotated.x * fov_factor) / (vec_rotated.z - camera_position.z),
+      (-vec_rotated.y * fov_factor) / (vec_rotated.z - camera_position.z)};
 
   int target_x = (int)(((float_t)pixel_buffer->width / 2) + projected_point.x);
   int target_y = (int)(((float_t)pixel_buffer->height / 2) + projected_point.y);
 
-  float_t distance = vec.z - camera_position.z;
+  float_t distance = vec_rotated.z - camera_position.z;
   float_t max_distance = 10.0f;
   float_t brightness = 1.0f - (distance / max_distance);
 
@@ -106,6 +111,7 @@ int main() {
   }
 
   while (!WindowShouldClose()) {
+    cube_rotation += 0.01;
     // Update texture
     // shader_pixel_buffer(pixel_buffer, cheker_board, NULL);
     // rectangle_pixel_buffer(pixel_buffer, 400, 400, 500, 500, COLOR_RGB(0xDD0000));
