@@ -69,7 +69,7 @@ void perspective_projection(PixelBuffer* pixel_buffer, Vec3 vec, Pixel color) {
       .a = color.a,
   };
 
-  rectangle_pixel_buffer(pixel_buffer, target_x, target_y, 5, 5, shaded_color);
+  rectangle_pixel_buffer(pixel_buffer, target_x, target_y, 10 * brightness, 10 * brightness, shaded_color);
 }
 
 int main() {
