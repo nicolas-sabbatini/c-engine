@@ -3,11 +3,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "mesh.h"
 #include "pixel_buffer.h"
 #include "vectors.h"
 #include "vendors/raylib.h"
 
-const float_t fov_factor = 640.0;
+const float_t fov_factor =  640.0;
 const Vec3 camera_position = (Vec3){0.0, 0.0, -5.0};
 float_t cube_rotation = 0.0;
 
@@ -74,7 +75,7 @@ void perspective_projection(PixelBuffer* pixel_buffer, Vec3 vec, Pixel color) {
 
 int main() {
   // Set up screen
-  SetConfigFlags(FLAG_WINDOW_HIGHDPI | FLAG_WINDOW_UNDECORATED | FLAG_VSYNC_HINT);
+  SetConfigFlags(FLAG_WINDOW_UNDECORATED | FLAG_VSYNC_HINT);
   size_t screen_width = 0;
   size_t screen_height = 0;
   InitWindow(screen_width, screen_height, "Simple c engine");
@@ -82,8 +83,9 @@ int main() {
   int monitor = GetCurrentMonitor();
   SetWindowSize(GetMonitorWidth(monitor), GetMonitorHeight(monitor));
   // 4k monitor is to much so 1024 x 640
-  screen_width = GetMonitorWidth(monitor) / 4;
-  screen_height = GetMonitorHeight(monitor) / 4;
+  screen_width = GetMonitorWidth(monitor);
+  screen_height = GetMonitorHeight(monitor);
+
   printf("Buffer size: %zu x %zu\n", screen_width, screen_height);
 
   // Create pixel buffer
@@ -99,31 +101,48 @@ int main() {
   Texture2D texture = LoadTextureFromImage(img);
 
   // Create a cube of points
-  size_t point_count = 0;
-  Vec3* cube = malloc(sizeof(Vec3) * 9 * 9 * 9);
-  for (float_t x = -1.0; x <= 1; x += 0.25) {
-    for (float_t y = -1.0; y <= 1; y += 0.25) {
-      for (float_t z = -1.0; z <= 1; z += 0.25) {
-        cube[point_count] = (Vec3){x, y, z};
-        point_count += 1;
-      }
-    }
-  }
+  Vec3 cube[8] = {
+    (Vec3){.x = -1.0, .y = -1.0, .z = -1.0},
+    (Vec3){.x = -1.0, .y = 1.0, .z = -1.0},
+    (Vec3){.x = 1.0, .y = 1.0, .z = -1.0},
+    (Vec3){.x = 1.0, .y = -1.0, .z = -1.0},
+    (Vec3){.x = 1.0, .y = 1.0, .z = 1.0},
+    (Vec3){.x = 1.0, .y = -1.0, .z = 1.0},
+    (Vec3){.x = -1.0, .y = 1.0, .z = 1.0},
+    (Vec3){.x = -1.0, .y = -1.0, .z = 1.0}
+  };
+  size_t face_count = 12;
+  Triangle mesh[12] = {
+    // Front
+    (Triangle){.a = 1, .b = 2, .c = 3},
+    (Triangle){.a = 1, .b = 3, .c = 4},
+    // right
+    (Triangle){.a = 4, .b = 3, .c = 5},
+    (Triangle){.a = 4, .b = 5, .c = 6},
+    // back
+    (Triangle){.a = 6, .b = 5, .c = 7},
+    (Triangle){.a = 6, .b = 7, .c = 8},
+    // left
+    (Triangle){.a = 8, .b = 7, .c = 2},
+    (Triangle){.a = 8, .b = 2, .c = 1},
+    // top
+    (Triangle){.a = 2, .b = 7, .c = 5},
+    (Triangle){.a = 2, .b = 5, .c = 3},
+    // bottom
+    (Triangle){.a = 6, .b = 8, .c = 1},
+    (Triangle){.a = 6, .b = 1, .c = 4},
+  };
 
   while (!WindowShouldClose()) {
-    cube_rotation += 0.01;
+    float_t dt = GetFrameTime();
+    cube_rotation += 1.0 * dt;
     // Update texture
-    // shader_pixel_buffer(pixel_buffer, cheker_board, NULL);
-    // rectangle_pixel_buffer(pixel_buffer, 400, 400, 500, 500, COLOR_RGB(0xDD0000));
     clear_pixel_buffer(pixel_buffer, COLOR_RGB(0x0F0F0F));
-    for (size_t point = 0; point < point_count; point++) {
-      // orthographic_projection(pixel_buffer, cube[point], COLOR_RGB(0xF0A00F));
-      // isometric_projection(pixel_buffer, cube[point], COLOR_RGB(0xF0A00F));
-      perspective_projection(pixel_buffer, cube[point], COLOR_RGB(0xF0A00F));
+    for (size_t face = 0; face < face_count; face++) {
+      perspective_projection(pixel_buffer, cube[mesh[face].a - 1], COLOR_RGB(0xF0A00F));
+      perspective_projection(pixel_buffer, cube[mesh[face].b - 1], COLOR_RGB(0xF0A00F));
+      perspective_projection(pixel_buffer, cube[mesh[face].c - 1], COLOR_RGB(0xF0A00F));
     }
-    // orthographic_projection(pixel_buffer, (Vec3){-1.0, -1.0, -1.0}, COLOR_RGB(0xA00FF0));
-    // isometric_projection(pixel_buffer, (Vec3){-1.0, -1.0, -1.0}, COLOR_RGB(0xA00FF0));
-    // perspective_projection(pixel_buffer, (Vec3){-1.0, -1.0, -1.0}, COLOR_RGB(0xA00FF0));
     // Send changes to GPU
     UpdateTexture(texture, pixel_buffer->buffer);
 
@@ -131,7 +150,7 @@ int main() {
     BeginDrawing();
     ClearBackground(BLACK);
     // Scale to 4k
-    DrawTextureEx(texture, (Vector2){}, 0, 4.0, WHITE);
+    DrawTextureEx(texture, (Vector2){}, 0, 1.0, WHITE);
     DrawFPS(10, 10);
     EndDrawing();
   }
@@ -139,9 +158,6 @@ int main() {
   // Free pixel buffer
   free(pixel_buffer);
   UnloadTexture(texture);
-
-  // Frre cube
-  free(cube);
 
   CloseWindow();
   return EXIT_SUCCESS;

@@ -45,3 +45,4 @@ void rectangle_pixel_buffer(
     Pixel color);
 
 void poke_pixel_buffer(PixelBuffer* pixel_buffer, int x, int y, Pixel color);
+
