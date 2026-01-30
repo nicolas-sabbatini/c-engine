@@ -8,7 +8,7 @@
 #include "vectors.h"
 #include "vendors/raylib.h"
 
-const float_t fov_factor =  640.0;
+const float_t fov_factor = 640.0;
 const Vec3 camera_position = (Vec3){0.0, 0.0, -5.0};
 float_t cube_rotation = 0.0;
 
@@ -83,8 +83,8 @@ int main() {
   int monitor = GetCurrentMonitor();
   SetWindowSize(GetMonitorWidth(monitor), GetMonitorHeight(monitor));
   // 4k monitor is to much so 1024 x 640
-  screen_width = GetMonitorWidth(monitor);
-  screen_height = GetMonitorHeight(monitor);
+  screen_width = GetMonitorWidth(monitor) / 4;
+  screen_height = GetMonitorHeight(monitor) / 4;
 
   printf("Buffer size: %zu x %zu\n", screen_width, screen_height);
 
@@ -102,35 +102,34 @@ int main() {
 
   // Create a cube of points
   Vec3 cube[8] = {
-    (Vec3){.x = -1.0, .y = -1.0, .z = -1.0},
-    (Vec3){.x = -1.0, .y = 1.0, .z = -1.0},
-    (Vec3){.x = 1.0, .y = 1.0, .z = -1.0},
-    (Vec3){.x = 1.0, .y = -1.0, .z = -1.0},
-    (Vec3){.x = 1.0, .y = 1.0, .z = 1.0},
-    (Vec3){.x = 1.0, .y = -1.0, .z = 1.0},
-    (Vec3){.x = -1.0, .y = 1.0, .z = 1.0},
-    (Vec3){.x = -1.0, .y = -1.0, .z = 1.0}
-  };
+      (Vec3){.x = -1.0, .y = -1.0, .z = -1.0},
+      (Vec3){.x = -1.0, .y = 1.0, .z = -1.0},
+      (Vec3){.x = 1.0, .y = 1.0, .z = -1.0},
+      (Vec3){.x = 1.0, .y = -1.0, .z = -1.0},
+      (Vec3){.x = 1.0, .y = 1.0, .z = 1.0},
+      (Vec3){.x = 1.0, .y = -1.0, .z = 1.0},
+      (Vec3){.x = -1.0, .y = 1.0, .z = 1.0},
+      (Vec3){.x = -1.0, .y = -1.0, .z = 1.0}};
   size_t face_count = 12;
   Triangle mesh[12] = {
-    // Front
-    (Triangle){.a = 1, .b = 2, .c = 3},
-    (Triangle){.a = 1, .b = 3, .c = 4},
-    // right
-    (Triangle){.a = 4, .b = 3, .c = 5},
-    (Triangle){.a = 4, .b = 5, .c = 6},
-    // back
-    (Triangle){.a = 6, .b = 5, .c = 7},
-    (Triangle){.a = 6, .b = 7, .c = 8},
-    // left
-    (Triangle){.a = 8, .b = 7, .c = 2},
-    (Triangle){.a = 8, .b = 2, .c = 1},
-    // top
-    (Triangle){.a = 2, .b = 7, .c = 5},
-    (Triangle){.a = 2, .b = 5, .c = 3},
-    // bottom
-    (Triangle){.a = 6, .b = 8, .c = 1},
-    (Triangle){.a = 6, .b = 1, .c = 4},
+      // Front
+      (Triangle){.a = 1, .b = 2, .c = 3},
+      (Triangle){.a = 1, .b = 3, .c = 4},
+      // right
+      (Triangle){.a = 4, .b = 3, .c = 5},
+      (Triangle){.a = 4, .b = 5, .c = 6},
+      // back
+      (Triangle){.a = 6, .b = 5, .c = 7},
+      (Triangle){.a = 6, .b = 7, .c = 8},
+      // left
+      (Triangle){.a = 8, .b = 7, .c = 2},
+      (Triangle){.a = 8, .b = 2, .c = 1},
+      // top
+      (Triangle){.a = 2, .b = 7, .c = 5},
+      (Triangle){.a = 2, .b = 5, .c = 3},
+      // bottom
+      (Triangle){.a = 6, .b = 8, .c = 1},
+      (Triangle){.a = 6, .b = 1, .c = 4},
   };
 
   while (!WindowShouldClose()) {
@@ -150,7 +149,7 @@ int main() {
     BeginDrawing();
     ClearBackground(BLACK);
     // Scale to 4k
-    DrawTextureEx(texture, (Vector2){}, 0, 1.0, WHITE);
+    DrawTextureEx(texture, (Vector2){}, 0.0, 4.0, WHITE);
     DrawFPS(10, 10);
     EndDrawing();
   }
