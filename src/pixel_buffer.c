@@ -57,4 +57,3 @@ void poke_pixel_buffer(PixelBuffer* pixel_buffer, int x, int y, Pixel color) {
     pixel_buffer->buffer[(y * pixel_buffer->width) + x] = color;
   }
 }
-
